@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import re
-import work_with_files as files
+from cleaner import work_with_files as files
 
 
 def is_empty_line(line: str):
