@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
-from cleaner.delete_duplicate_string import delete_duplicate_lines
-from cleaner.delete_service_data import clean_service_data
+from delete_duplicate_string import delete_duplicate_lines
+from delete_service_data import clean_service_data
 
 app = Flask(__name__)
 
