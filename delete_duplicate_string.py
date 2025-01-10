@@ -1,47 +1,35 @@
 import re
 
-def is_empty_line(line):
+def is_empty_line(line: str) -> bool:
     """Check if a line is empty."""
-    return bool(re.match(r"\s*\n", line))
+    return bool(re.match(r"\s*$", line))
 
-def is_time_code(line):
-    """Check if a line contains a timecode."""
+def is_time_code(line: str) -> bool:
+    """Check if a line has a timecode."""
     time = r"\d{2}:\d{2}:\d{2}\.\d{3}"
-    return bool(re.match(time + r"\s*-->\s*" + time + r"\s*\n", line))
+    return bool(re.match(time + r"\s*-->\s*" + time, line))
 
-def is_suitable_line(line):
-    """Check if a line is a valid subtitle text."""
+def is_suitable_line(line: str) -> bool:
+    """Check if a line is a suitable subtitle line."""
     return not is_empty_line(line) and not is_time_code(line)
 
-def get_chunk(text):
-    """Generate chunks of lines for processing."""
-    for index in reversed(range(1, len(text) - 1)):
-        yield index, text[index-1:index+2]
+def delete_duplicate_lines(subtitles: list) -> list:
+    """Remove duplicate subtitle lines based on their text field.
 
-def is_empty_timecode(chunk):
-    """Check if a chunk consists of an empty timecode."""
-    return is_empty_line(chunk[0]) and is_time_code(chunk[1]) and is_empty_line(chunk[2])
+    Args:
+        subtitles (list): List of subtitle dictionaries with 'start', 'end', and 'text'.
 
-def del_chunk_with_index(index, text):
-    """Delete a chunk of lines by index."""
-    text.pop(index + 1)
-    text.pop(index)
-    text.pop(index - 1)
+    Returns:
+        list: Deduplicated list of subtitle dictionaries.
+    """
+    found_texts = set()
+    deduplicated_subtitles = []
 
-def delete_duplicate_lines(input_text):
-    """Remove duplicate lines and unnecessary timecodes."""
-    found_lines = set()
-    output_text = list(input_text)
+    for subtitle in subtitles:
+        text = subtitle.get("text", "")
+        if is_suitable_line(text):
+            if text not in found_texts:
+                found_texts.add(text)
+                deduplicated_subtitles.append(subtitle)
 
-    for index, line in reversed(list(enumerate(input_text))):
-        if is_suitable_line(line):
-            if line not in found_lines:
-                found_lines.add(line)
-            else:
-                output_text.pop(index)
-
-    for index, chunk in get_chunk(output_text):
-        if is_empty_timecode(chunk):
-            del_chunk_with_index(index, output_text)
-
-    return output_text
+    return deduplicated_subtitles
