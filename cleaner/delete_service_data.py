@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import re
-import work_with_files as files
+from cleaner import work_with_files as files
 
 
 def delete_matches(pattern: str, line: str) -> str:
